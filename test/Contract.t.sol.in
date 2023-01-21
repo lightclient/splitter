@@ -10,19 +10,24 @@ contract ContractTest is Test {
     function setUp() public {
         bytes memory bytecode = hex"@bytecode@";
         address returned;
-
         assembly {
             returned := create(0, add(bytecode, 32), bytecode)
         }
-
         unit = returned;
     }
 
-    function testExample() public {
+    function testSingle() public {
         assertTrue(unit != address(0));
 
-        unit.call(hex"");
-        bytes32 slot0 = vm.load(unit, bytes32(uint256(0)));
-        assertEq(slot0, bytes32(uint256(0x68656c6c6f20776f726c64)));
+        unit.call{value: 100}(hex"60AdC0F89a41AF237ce73554EDe170D733ec14E0");
+        assertEq(address(0x60AdC0F89a41AF237ce73554EDe170D733ec14E0).balance, 100 wei);
+    }
+
+    function testMultiple() public {
+        assertTrue(unit != address(0));
+
+        unit.call{value: 100}(hex"60AdC0F89a41AF237ce73554EDe170D733ec14E160AdC0F89a41AF237ce73554EDe170D733ec14E2");
+        assertEq(address(0x60adc0F89A41af237ce73554edE170d733EC14E1).balance, 50 wei);
+        assertEq(address(0x60Adc0f89a41af237CE73554edE170d733ec14e2).balance, 50 wei);
     }
 }

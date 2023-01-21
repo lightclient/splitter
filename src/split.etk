@@ -1,0 +1,56 @@
+# addr_at returns a masked 20-byte address from calldata.
+#
+# It expects 1 stack element, the offset in calldata, to read the first byte of
+# an address.
+%macro addr_at()
+    calldataload    # [dirty_addr]
+    push32 0xffffffffffffffffffffffffffffffffffffffff000000000000000000000000
+    and             # [masked_addr]
+    push1 12*8      # [96, masked_addr]
+    shr             # [addr]
+%end
+
+push1 $size     # [20]
+calldatasize    # [size, 20]
+div             # [count]
+callvalue       # [callvalue, count]
+div             # [amount]
+
+# Set initial index.
+push1 0         # [0, amount]
+
+loop:
+jumpdest        # [i, amount]
+
+# Loop bounds check. If i < calldatasize, continue.
+calldatasize    # [size, i, amount]
+dup2            # [i, size, i, amount]
+lt              # [i<size, i amount]
+iszero          # [i>=size, i, amount]
+push1 done      # [done, i>=size, i, amount]
+jumpi           # [i, amount]
+
+# Set up call op.
+push1 0         # [retSize, i, amount]
+dup1            # [retOffset, retSize, i, amount]
+dup1            # [argsSize, retOffset, retSize, i, amount]
+dup1            # [argsOffset, argsSize, retOffset, retSize, i, amount]
+dup6            # [value, argsOffset, argsSize, retOffset, retSize, i, amount]
+
+dup6            # [i, value, argsOffset, argsSize, retOffset, retSize, i, amount]
+%addr_at()
+
+gas             # [gas, addr[i], value, argsOffset, argsSize, retOffset, retSize, i, amount]
+call            # [result, i, amount]
+pop             # [i, amount]
+
+# Increment loop counter.
+push1 20        # [1, i, amount]
+add             # [i+1, amount]
+
+push1 loop      # [loop, i+1, amount]
+jump            # [i+1, amount]
+
+done:
+jumpdest
+stop
