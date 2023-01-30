@@ -1,16 +1,14 @@
-# addr_at returns a masked 20-byte address from calldata.
+# addr_at returns a 20-byte address from calldata.
 #
 # It expects 1 stack element, the offset in calldata, to read the first byte of
 # an address.
 %macro addr_at()
-    calldataload    # [dirty_addr]
-    push32 0xffffffffffffffffffffffffffffffffffffffff000000000000000000000000
-    and             # [masked_addr]
-    push1 12*8      # [96, masked_addr]
+    calldataload    # [upper_addr]
+    push1 12*8      # [96, upper_addr]
     shr             # [addr]
 %end
 
-push1 $size     # [20]
+push1 20        # [20]
 calldatasize    # [size, 20]
 div             # [count]
 callvalue       # [callvalue, count]
@@ -54,3 +52,4 @@ jump            # [i+1, amount]
 done:
 jumpdest
 stop
+

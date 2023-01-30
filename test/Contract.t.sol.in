@@ -26,8 +26,12 @@ contract ContractTest is Test {
     function testMultiple() public {
         assertTrue(unit != address(0));
 
-        unit.call{value: 100}(hex"60AdC0F89a41AF237ce73554EDe170D733ec14E160AdC0F89a41AF237ce73554EDe170D733ec14E2");
-        assertEq(address(0x60adc0F89A41af237ce73554edE170d733EC14E1).balance, 50 wei);
-        assertEq(address(0x60Adc0f89a41af237CE73554edE170d733ec14e2).balance, 50 wei);
+        unit.call{value: 5000}(hex"60AdC0F89a41AF237ce73554EDe170D733ec14E160AdC0F89a41AF237ce73554EDe170D733ec14E260AdC0F89a41AF237ce73554EDe170D733ec14E360AdC0F89a41AF237ce73554EDe170D733ec14E460AdC0F89a41AF237ce73554EDe170D733ec14E5");
+
+        assertEq(address(0x60adc0F89A41af237ce73554edE170d733EC14E1).balance, 1000 wei);
+        assertEq(address(0x60Adc0f89a41af237CE73554edE170d733ec14e2).balance, 1000 wei);
+        assertEq(address(0x60aDc0F89a41af237Ce73554EDE170D733ec14e3).balance, 1000 wei);
+        assertEq(address(0x60AdC0f89a41AF237ce73554edE170d733eC14E4).balance, 1000 wei);
+        assertEq(address(0x60ADC0f89a41Af237ce73554EdE170D733EC14E5).balance, 1000 wei);
     }
 }
